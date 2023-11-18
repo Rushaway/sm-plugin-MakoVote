@@ -12,11 +12,11 @@ public Plugin myinfo =
 	name        = "MakoVote",
 	author	    = "Neon, maxime1907, .Rushaway",
 	description = "MakoVote",
-	version     = "1.4",
+	version     = "1.5",
 	url         = "https://steamcommunity.com/id/n3ontm"
 }
 
-#define NUMBEROFSTAGES 6
+#define NUMBEROFSTAGES 7
 
 ConVar g_cDelay;
 ConVar g_cRtd;
@@ -28,7 +28,8 @@ bool g_bVoteFinished = true;
 bool bStartVoteNextRound = false;
 
 bool g_bOnCooldown[NUMBEROFSTAGES];
-static char g_sStageName[NUMBEROFSTAGES][512] = {"Extreme 2", "Extreme 2 (Heal + Ultima)", "Extreme 3 (ZED)", "Extreme 3 (Hellz)", "Race Mode", "Zombie Mode"};
+static char g_sStageName[NUMBEROFSTAGES][512] = {"Extreme 2", "Extreme 2 (Heal + Ultima)", "Extreme 3 (ZED)", "Extreme 3 (Hellz)", "Race Mode", "Zombie Mode", "Extreme 4 (NiDE)"};
+
 int g_Winnerstage;
 
 Handle g_VoteMenu = null;
@@ -458,24 +459,28 @@ public void Handler_VoteFinishedGeneric(Handle menu, int num_votes, int num_clie
 
 public int GetCurrentStage()
 {
-	int iLevelCounterEnt = FindEntityByTargetname(INVALID_ENT_REFERENCE, "LevelCounter", "math_counter");
+	// Spwaned as math_counter, but get changed as info_target
+	// "OnUser1" "LevelCounter,AddOutput,classname info_target,0.03,1"
+	int iLevelCounterEnt = FindEntityByTargetname(INVALID_ENT_REFERENCE, "LevelCounter", "info_target");
 
 	int offset = FindDataMapInfo(iLevelCounterEnt, "m_OutValue");
 	int iCounterVal = RoundFloat(GetEntDataFloat(iLevelCounterEnt, offset));
 
 	int iCurrentStage;
-	if (iCounterVal == 5)
+	if (iCounterVal == 5) // Ex2
 		iCurrentStage = 0;
-	else if (iCounterVal == 6)
+	else if (iCounterVal == 6) // ZM Mode
 		iCurrentStage = 5;
-	else if (iCounterVal == 7)
+	else if (iCounterVal == 7) // Ex2 (H+U)
 		iCurrentStage = 1;
-	else if (iCounterVal == 9)
+	else if (iCounterVal == 9) // Ex3 (Hellz)
 		iCurrentStage = 3;
-	else if (iCounterVal == 10)
+	else if (iCounterVal == 10) // Ex3 (ZED)
 		iCurrentStage = 2;
-	else if (iCounterVal == 11)
+	else if (iCounterVal == 11) // Race
 		iCurrentStage = 4;
+	else if (iCounterVal == 13) // Ex4 (NiDe)
+		iCurrentStage = 6;
 	else
 		iCurrentStage = -1;
 
